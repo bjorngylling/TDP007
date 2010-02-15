@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby
 
+# 2010-02-11 New version of this file for the 2010 instance of TDP007
+#   which handles false return values during parsing, and has an easy way
+#   of turning on and off debug messages.
+
 require 'logger'
 
 class Rule
-  # A rule is created through the rule method of the Parser class, like so:
+
+  # A rule is created through the rule method of the Parser class, like this:
   #   rule :term do
   #     match(:term, '*', :dice) {|a, _, b| a * b }
   #     match(:term, '/', :dice) {|a, _, b| a / b }
@@ -13,22 +18,20 @@ class Rule
   Match = Struct.new :pattern, :block
   
   def initialize(name, parser)
+    @logger = parser.logger
     # The name of the expressions this rule matches
-    @logger=Logger.new(STDOUT)
     @name = name
-    # We need the parser to recursively parse sub-expressions
-    # occurring within the pattern of the match objects associated
-    # with this rule
+    # We need the parser to recursively parse sub-expressions occurring 
+    # within the pattern of the match objects associated with this rule
     @parser = parser
     @matches = []
-    # Left-recursive matches, which in the first two cases 
+    # Left-recursive matches
     @lrmatches = []
   end
   
   # Add a matching expression to this rule, as in this example:
-  #     match(:term, '*', :dice) {|a, _, b| a * b }
+  #   match(:term, '*', :dice) {|a, _, b| a * b }
   # The arguments to 'match' describe the constituents of this expression.
-  
   def match(*pattern, &block)
     match = Match.new(pattern, block)
     # If the pattern is left-recursive, then add it to the left-recursive set
@@ -40,19 +43,16 @@ class Rule
     end
   end
   
-  
   def parse
     # Try non-left-recursive matches first, to avoid infinite recursion
     match_result = try_matches(@matches)
-    return nil unless match_result
+    return nil if match_result.nil?
     loop do
       result = try_matches(@lrmatches, match_result)
-      return match_result unless result
+      return match_result if result.nil?
       match_result = result
     end
   end
-  
-  
 
   private
   
@@ -65,16 +65,15 @@ class Rule
       # pre_result is a previously available result from evaluating expressions
       result = pre_result ? [pre_result] : []
 
-      # We iterate through the parts of the pattern, which may be
-      # [:expr,'*',:term]
+      # We iterate through the parts of the pattern, which may be e.g.
+      #   [:expr,'*',:term]
       match.pattern.each_with_index do |token,index|
         
         # If this "token" is a compound term, add the result of
         # parsing it to the "result" array
-        
         if @parser.rules[token]
           result << @parser.rules[token].parse
-          unless result.last
+          if result.last.nil?
             result = nil
             break
           end
@@ -85,9 +84,9 @@ class Rule
           if nt
             result << nt
             if @lrmatches.include?(match.pattern) then
-              pattern=[@name]+match.pattern
+              pattern = [@name]+match.pattern
             else
-              pattern=match.pattern
+              pattern = match.pattern
             end
             @logger.debug("Matched token '#{nt}' as part of rule '#{@name} <= #{pattern.inspect}'")
           else
@@ -115,27 +114,27 @@ class Rule
   end
 end
 
-
 class Parser
 
-  # include PrettyPrint
-
   attr_accessor :pos
-  attr_reader :rules,:string
-  class ParseError < RuntimeError; end
+  attr_reader :rules, :string, :logger
+
+  class ParseError < RuntimeError
+  end
+
   def initialize(language_name, &block)
-    @logger=Logger.new(STDOUT)
+    @logger = Logger.new(STDOUT)
     @lex_tokens = []
     @rules = {}
     @start = nil
-    @language_name=language_name
+    @language_name = language_name
     instance_eval(&block)
   end
   
   # Tokenize the string into small pieces
   def tokenize(string)
     @tokens = []
-    @string=string.clone
+    @string = string.clone
     until string.empty?
       # Unless any of the valid tokens of our language are the prefix of
       # 'string', we fail with an exception
@@ -159,10 +158,9 @@ class Parser
   end
   
   def parse(string)
-    # First, split the string according to the "token" instructions given to Parser
+    # First, split the string according to the "token" instructions given.
+    # Afterwards @tokens contains all tokens that are to be parsed. 
     tokenize(string)
-    print "\n\n #{@tokens.join(",")} \n\n"
-    # Now, @tokens contains all tokens that are to be parsed. 
 
     # These variables are used to match if the total number of tokens
     # are consumed by the parser
@@ -220,7 +218,7 @@ class Parser
   end
   
   def match(*pattern, &block)
-    @current_rule.send(:match,*pattern,&block)
+    @current_rule.send(:match, *pattern, &block)
   end
 
 end
@@ -230,22 +228,6 @@ end
 # This part defines the logic evaluator language
 #
 #################################################################################
-
-=begin
-
---- BNF ---
-
-VALID ::= ASSIGN
-VALID ::= EXPR
-ASSIGN ::= '(' 'set' VAR EXPR')'     <-- Tilldelning av variabel
-EXPR ::= '(' 'or' EXPR EXPR ')'
-EXPR ::= '(' 'and' EXPR EXPR ')'
-EXPR ::= '(' 'not' EXPR ')'
-EXPR ::= TERM
-TERM ::= VAR                         <-- Variabel
-TERM ::= 'true'
-TERM ::= 'false'
-=end
 
 class LogicEval
  
@@ -258,11 +240,11 @@ class LogicEval
 	  @var_space = Hash.new()
       token(/\s+/)
       token(/\w+/) { |m| m }
-      token(/[( | )]/) {|m| m }
+      token(/./) {|m| m }
 
       start :valid do
-	 	match(:assign)
-	 	match(:expr)
+        match(:assign)
+        match(:expr)
       end
  
       rule :assign do
@@ -271,14 +253,14 @@ class LogicEval
       
       rule :expr do 
         match('(','or',:expr,:expr,')') {|_, _, a, b, _| a or b }
-		match('(','and',:expr,:expr,')') {|_, _, a, b, _| a and b }
-		match('(','not',:expr,')') {|_, _, a, _| not a }
+        match('(','and',:expr,:expr,')') {|_, _, a, b, _| a and b }
+        match('(','not',:expr,')') {|_, _, a, _| not a }
         match(:term)
       end
       
       rule :term do 
-        match('true') {|a| a}
-        match('false') {|a| a}
+        match('true') {|a| true}
+        match('false') {|a| false}
         match(:var)
       end
       
@@ -302,84 +284,12 @@ class LogicEval
       parse
     end
   end
-end
 
-#################################################################################
-#
-# This part defines the dice language
-#
-#################################################################################
-
-class DiceRoller
-
-        
-  def DiceRoller.roll(times, sides)
-    (1..times).inject(0) {|sum, _| sum + rand(sides) + 1 }
-  end
-  
-  def initialize
-    @diceParser = Parser.new("dice roller") do
-      token(/\s+/)
-      token(/\d+/) {|m| m.to_i }
-      token(/./) {|m| m }
-      
-      start :expr do 
-        match(:expr, '+', :term) {|a, _, b| a + b }
-        match(:expr, '-', :term) {|a, _, b| a - b }
-        match(:term)
-      end
-      
-      rule :term do 
-        match(:term, '*', :dice) {|a, _, b| a * b }
-        match(:term, '/', :dice) {|a, _, b| a / b }
-        match(:dice)
-      end
-
-      rule :dice do
-        match(:atom, 'd', :sides) {|a, _, b| DiceRoller.roll(a, b) }
-        match('d', :sides) {|_, b| DiceRoller.roll(1, b) }
-        match(:atom)
-      end
-      
-      rule :sides do
-        match('%') { 100 }
-        match(:atom)
-      end
-      
-      rule :atom do
-        # Match the result of evaluating an integer expression, which
-        # should be an Integer
-        match(Integer)
-        match('(', :expr, ')') {|_, a, _| a }
-      end
-    end
-  end
-  
-  def done(str)
-    ["quit","exit","bye",""].include?(str.chomp)
-  end
-  
-  def roll
-    print "[diceroller] "
-    str=gets
-    if done(str) then
-      puts "Bye."
+  def log(state = false)
+    if state
+      @logicParser.logger.level = Logger::DEBUG
     else
-      puts "=> #{@diceParser.parse str}"
-      roll
+      @logicParser.logger.level = Logger::WARN
     end
   end
 end
-
-# Test: 
-
-# irb(main):1696:0> DiceRoller.new.roll
-# [diceroller] 1+3
-# => 4
-# [diceroller] 1+d4
-# => 2
-# [diceroller] 1+d4
-# => 3
-# [diceroller] (2+8*d20)*3d6
-# => 306
-
