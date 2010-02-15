@@ -238,9 +238,9 @@ class LogicEval
   def initialize
     @logicParser = Parser.new("logic evaluator") do
 	  @var_space = Hash.new()
-      token(/\s+/)
-      token(/\w+/) { |m| m }
-      token(/./) {|m| m }
+      token(/\s+/) # Remove whitespace
+      token(/\w+/) { |m| m } # Extract whole words
+      token(/./) {|m| m } # Extract whatever is left as single chars
 
       start :valid do
         match(:assign)
@@ -268,6 +268,8 @@ class LogicEval
         match(/[A-Za-z]+/) {|a| @var_space[a.intern] ? @var_space[a.intern] : a}
       end
     end
+    
+    @logicParser.logger.level = Logger::WARN # Set logger to hide debug-messages
   end
   
   def done(str)
