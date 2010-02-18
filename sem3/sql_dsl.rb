@@ -1,6 +1,32 @@
 require 'rubygems'
 require 'sqlite3' # gem install sqlite3-ruby
 
+class Object
+  def dclone
+    case self
+      when Fixnum,Bignum,Float,NilClass,FalseClass,
+           TrueClass,Continuation
+        klone = self
+      when Hash
+        klone = self.clone
+        self.each{|k,v| klone[k] = v.dclone}
+      when Array
+        klone = self.clone
+        klone.clear
+        self.each{|v| klone << v.dclone}
+      else
+        klone = self.clone
+    end
+    klone.instance_variables.each {|v|
+      klone.instance_variable_set(v,
+        klone.instance_variable_get(v).dclone)
+    }
+    klone
+  end
+end
+
+
+
 class ActiveRecord
 	@@sub_classes = Hash.new
 	
@@ -25,7 +51,7 @@ class ActiveRecord
 	
 	def initialize(database_connection)
 		@db_con = database_connection
-		@properties = @@sub_classes[self.class]
+		@properties = @@sub_classes[self.class].dclone
 		
 		if table_exists? : load_table else create_table end
 	end
@@ -36,6 +62,12 @@ class ActiveRecord
 			name = name.chop.intern
 			assignment = true
 		end
+		
+		# p "Here coes the classes:"
+		# @@sub_classes.each do |klass|
+		# 	p klass
+		# end
+		# p "Ending.."
 		
 		return super unless @properties[:one].merge(@properties[:many]).has_key?(name)
 		
@@ -80,9 +112,15 @@ database = SQLite3::Database.new("sem3_sqlite3.db")
 
 # Create our object with our database-connection
 a = VEvent.new(database)
+b = VEvent.new(database)
 
 f = Family.new(database)
 
 a.description = "Lecture in TDP007"
 a.name = "DSL and Parsers"
 a.category = %w(IDA SU17 SU18)
+
+b.name = "Harry Potter screening"
+
+p a
+p b
