@@ -231,7 +231,7 @@ end
 
 class LogicEval
  
-  def LogicEval.evaluate(exp)
+  def evaluate(exp)
     @logicParser.parse exp
   end
   
@@ -265,7 +265,7 @@ class LogicEval
       end
       
       rule :var do
-        match(/[A-Za-z]+/) {|a| @var_space[a.intern] ? @var_space[a.intern] : a}
+        match(/[A-Za-z]+/) {|a| @var_space[a.intern] != nil ? @var_space[a.intern] : a}
       end
     end
     
