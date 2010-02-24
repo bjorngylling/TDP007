@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'sqlite3' # gem install sqlite3-ruby
 
+# Deep Cloning by Andrew L. Johnson
+# http://www.siaris.net/index.cgi/Programming/LanguageBits/Ruby/DeepClone.rdoc
 class Object
   def dclone
     case self
@@ -24,7 +26,6 @@ class Object
     klone
   end
 end
-
 
 
 class ActiveRecord
