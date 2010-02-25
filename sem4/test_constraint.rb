@@ -15,18 +15,17 @@ class TestCN < Test::Unit::TestCase
 		
 		assert_equal(15, c.value) 
 		
-		#puts "c = "+c.value.to_s
 		
 		a.forget_value "user"
 		c.user_assign(20)
 		
 		assert_equal(15, a.value)
 		
+		
 		b.forget_value "user"
 		c.user_assign(29)
 		
-		p b.value
-		#assert_equal(14, b.value)
+		assert_equal(14, b.value)
 	end
 	
 	
