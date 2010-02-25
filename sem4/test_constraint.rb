@@ -22,6 +22,26 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(14, b.value)
 	end
 	
+	def test_multiplier
+		a = Connector.new("a")
+		b = Connector.new("b")
+		c = Connector.new("c")
+		Multiplier.new(a, b, c)
+		
+		a.user_assign(10)
+		b.user_assign(5)
+		assert_equal(50, c.value) 
+		
+		a.forget_value "user"
+		c.user_assign(20)
+		assert_equal(4, a.value)
+		
+		b.forget_value "user"
+		a.user_assign(3)
+		c.user_assign(9)
+		assert_equal(3, b.value)
+	end
+	
 	def test_celsius2fahrenheit
 		c,f=fahrenheit2celsius
 		
