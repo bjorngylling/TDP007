@@ -43,7 +43,7 @@ class TestCN < Test::Unit::TestCase
 	end
 	
 	def test_celsius2fahrenheit
-		c,f=fahrenheit2celsius
+		c, f = celsius2fahrenheit
 		
 		c.user_assign 100
 		assert_equal(212, f.value)
