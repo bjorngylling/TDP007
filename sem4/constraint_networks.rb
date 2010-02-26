@@ -180,17 +180,17 @@ end
 #  Assignment
 # ----------------------------------------------------------------------------
 
-# Uppgift 1 inför fjärde seminariet innebär två saker:
-# - Först ska ni skriva enhetstester för Adder och Multiplier. Det är inte
-#   helt säkert att de funkar som de ska. Om ni med era tester upptäcker
+# Uppgift 1 infï¿½r fjï¿½rde seminariet innebï¿½r tvï¿½ saker:
+# - Fï¿½rst ska ni skriva enhetstester fï¿½r Adder och Multiplier. Det ï¿½r inte
+#   helt sï¿½kert att de funkar som de ska. Om ni med era tester upptï¿½cker
 #   fel ska ni dessutom korrigera Adder och Multiplier.
-# - Med hjälp av Adder och Multiplier m.m. ska ni sedan bygga ett nätverk som
+# - Med hjï¿½lp av Adder och Multiplier m.m. ska ni sedan bygga ett nï¿½tverk som
 #   kan omvandla temperaturer mellan Celsius och Fahrenheit. (Om ni vill
-#   får ni ta en annan ekvation som är ungefär lika komplicerad.)
+#   fï¿½r ni ta en annan ekvation som ï¿½r ungefï¿½r lika komplicerad.)
 
-# Ett tips är att skapa en funktion celsius2fahrenheit som returnerar
-# två Connectors. Dessa två motsvarar Celsius respektive Fahrenheit och 
-# kan användas för att mata in temperatur i den ena eller andra skalan.
+# Ett tips ï¿½r att skapa en funktion celsius2fahrenheit som returnerar
+# tvï¿½ Connectors. Dessa tvï¿½ motsvarar Celsius respektive Fahrenheit och 
+# kan anvï¿½ndas fï¿½r att mata in temperatur i den ena eller andra skalan.
 
 def celsius2fahrenheit
 	# Create our celsius and fahrenheit connectors
