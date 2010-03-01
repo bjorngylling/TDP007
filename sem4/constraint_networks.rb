@@ -31,6 +31,7 @@ class ArithmeticConstraint
 
   def initialize(a, b, out)
     @logger=Logger.new(STDOUT)
+    @logger.level = Logger::ERROR
     @a,@b,@out=[a,b,out]
     [a,b,out].each { |x| x.add_constraint(self) }
   end
@@ -40,7 +41,6 @@ class ArithmeticConstraint
   end
   
   def new_value(connector)
-	p connector
 	if [a,b,out].include?(connector)
 		if a.has_value? and b.has_value? and (not out.has_value?)
 			# Inputs changed, so update output to be the sum of the inputs
@@ -108,6 +108,7 @@ class Connector
     @informant=false
     @constraints=[]
     @logger=Logger.new(STDOUT)
+    @logger.level = Logger::ERROR
   end
 
   def add_constraint(c)
@@ -180,17 +181,17 @@ end
 #  Assignment
 # ----------------------------------------------------------------------------
 
-# Uppgift 1 infï¿½r fjï¿½rde seminariet innebï¿½r tvï¿½ saker:
-# - Fï¿½rst ska ni skriva enhetstester fï¿½r Adder och Multiplier. Det ï¿½r inte
-#   helt sï¿½kert att de funkar som de ska. Om ni med era tester upptï¿½cker
+# Uppgift 1 inför fjärde seminariet innebär två saker:
+# - Först ska ni skriva enhetstester för Adder och Multiplier. Det är inte
+#   helt säkert att de funkar som de ska. Om ni med era tester upptäcker
 #   fel ska ni dessutom korrigera Adder och Multiplier.
-# - Med hjï¿½lp av Adder och Multiplier m.m. ska ni sedan bygga ett nï¿½tverk som
+# - Med hjälp av Adder och Multiplier m.m. ska ni sedan bygga ett nätverk som
 #   kan omvandla temperaturer mellan Celsius och Fahrenheit. (Om ni vill
-#   fï¿½r ni ta en annan ekvation som ï¿½r ungefï¿½r lika komplicerad.)
+#   får ni ta en annan ekvation som är ungefär lika komplicerad.)
 
-# Ett tips ï¿½r att skapa en funktion celsius2fahrenheit som returnerar
-# tvï¿½ Connectors. Dessa tvï¿½ motsvarar Celsius respektive Fahrenheit och 
-# kan anvï¿½ndas fï¿½r att mata in temperatur i den ena eller andra skalan.
+# Ett tips är att skapa en funktion celsius2fahrenheit som returnerar
+# två Connectors. Dessa två motsvarar Celsius respektive Fahrenheit och 
+# kan användas för att mata in temperatur i den ena eller andra skalan.
 
 def celsius2fahrenheit
 	# Create our celsius and fahrenheit connectors

@@ -1,5 +1,5 @@
 require "test/unit"
-require "constraint_networks.rb"
+require "constraint-parser.rb"
 
 class TestCN < Test::Unit::TestCase
 	def test_adder
@@ -52,8 +52,18 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(32, f.value)
 		
 		c.forget_value "user"
+		f.user_assign 0
+		assert_equal(-18, c.value)
+	end
+	
+	def test_constraintparser
+		cp = ConstraintParser.new
+		c,f = cp.parse "9*c=5*(f-32)"
+		
+		f.user_assign 32
+		assert_equal(0, c.value)
+		
 		f.user_assign 100
 		assert_equal(37, c.value)
 	end
-	
 end
