@@ -31,7 +31,7 @@ class ArithmeticConstraint
 
   def initialize(a, b, out)
     @logger=Logger.new(STDOUT)
-    @logger.level = Logger::ERROR
+    @logger.level = Logger::DEBUG
     @a,@b,@out=[a,b,out]
     [a,b,out].each { |x| x.add_constraint(self) }
   end
@@ -41,28 +41,28 @@ class ArithmeticConstraint
   end
   
   def new_value(connector)
-	if [a,b,out].include?(connector)
-		if a.has_value? and b.has_value? and (not out.has_value?)
-			# Inputs changed, so update output to be the sum of the inputs
-			# "send" means that we send a message, op in this case, to an
-			# object.
-			val=a.value.send(op, b.value)
-			logger.debug("#{self} : #{out} updated")
-			out.assign(val, self)
-		elsif out.has_value? and (a.has_value? or b.has_value?) and (not (a.has_value? and b.has_value?))
-			# Expand the calculation to allow for inverse calculation if we know the "answer" already
-			if a.has_value?
-				val=out.value.send(inverse_op, a.value)
-				logger.debug("#{self} : #{b} updated")
-				b.assign(val, self)
-			else
-				val=out.value.send(inverse_op, b.value)	
-				logger.debug("#{self} : #{a} updated")
-				a.assign(val, self)
+		if [a,b,out].include?(connector)
+			if a.has_value? and b.has_value? and (not out.has_value?)
+				# Inputs changed, so update output to be the sum of the inputs
+				# "send" means that we send a message, op in this case, to an
+				# object.
+				val=a.value.send(op, b.value)
+				logger.debug("#{self} : #{out} updated")
+				out.assign(val, self)
+			elsif out.has_value? and (a.has_value? or b.has_value?) and (not (a.has_value? and b.has_value?))
+				# Expand the calculation to allow for inverse calculation if we know the "answer" already
+				if a.has_value?
+					val=out.value.send(inverse_op, a.value)
+					logger.debug("#{self} : #{b} updated")
+					b.assign(val, self)
+				else
+					val=out.value.send(inverse_op, b.value)	
+					logger.debug("#{self} : #{a} updated")
+					a.assign(val, self)
+				end
 			end
 		end
-	end
-	self
+		self
   end
   
   # A connector lost its value, so propagate this information to all
@@ -108,7 +108,7 @@ class Connector
     @informant=false
     @constraints=[]
     @logger=Logger.new(STDOUT)
-    @logger.level = Logger::ERROR
+    @logger.level = Logger::DEBUG
   end
 
   def add_constraint(c)

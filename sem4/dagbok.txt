@@ -1,0 +1,45 @@
+   Uppgift 1
+---------------
+
+- Del 1 -
+Vi började med att försöka förstå oss på koden, satt ett bra tag med detta tills vi lyckades klura ut var felet låg.
+När vi hittat var den valde mellan op och inverseop så såg vi att det endast fanns stöd för op, där fick vi lägga till
+kontroll för att se vilka värden vi hade för att veta om det skulle vara op eller inverseop.
+Constraint networks i övrigt känns väldigt svårt att greppa, vi stötte på vad vi trodde var ett fel. När man satt värden
+och sedan använder forget_value så glömmer den ibland fler värden än det man ska glömma. Tillslut insåg vi att det
+kanske är så det ska fungera. Det kan hända att det inte ska vara så alls och vi borde fixat den "buggen".
+
+- Del 2 -
+Denna delen gick lite smidigare än första. Var lite mer insatt i constraint networks. Funderade lite över vilken formel
+man skulle använda eftersom det är två olika beroende på om man ska konvertera från F till C eller tvärtom. Såg på seminariesidan
+att där fanns en formel som verkade bättre. Använde den och började fundera på hur man skulle bygga ett constraint network
+för den. Först var det lite svårt att klura ut hur man skulle börja men när jag kom på att man behövde flera connectors
+för att länka ihopa olika Adders/Multipliers så löste det sig förvånansvärt lätt.
+
+Inte så mycket att säga om själva Ruby-kodningen på dessa uppgifter då det inte var så mycket kodskrivande.
+
+   Uppgift 2
+---------------
+Denna uppgiften kändes tung att komma igång med. Satt ett bra tag och klurade på hur parsern fungerade och vad get_connectors
+var tänkt att göra eftersom det verkade som det var den funktionen som inte fungerade. Efter att ha printat invärdena i funktionen
+insåg jag att den inte alls fick connectors (som variabelnamnen antydde) alla gånger. Här behövdes det alltså nån slags kontroll.
+Skapade en funktion som plockade ut svar-connectorn ur en constraint om det var en sådan eller bara skickade tillbaka connectorn
+om det var en connector den fick in. Det löste runtime-felet men tyvärr så verkade nätverket inte blivit rätt gjort eftersom uträkningen
+blev fel. Spårade felet till konstanten 32 i (f - 32) verkade inte räknas med i uträknigen alls. I debugutskrifterna såg det ut som 
+det var plus där det skulle vara minus så jag gissade på att det inte räckte att kasta om a, b, c i inparametrarna till Adder.new.
+Provade en formel som innehöll division för att se om det var samma sak med Multiplier.new och det verkade det vara. Tog ett tag att
+klura ut en bra lösning på det då koden är ganska komplicerad att sätta sig in i. Kom fram till att det borde gå att tvinga 
+ArithmeticConstraint klassen att göra som jag vill. Kom ihåg op och inverseop från första uppgiften. Byggde ut ArithmeticConstraint
+klassen med en inverse-funktion som bytte plats på op och inverseop och sedan returnerade sigsjälv, fick några fel innan jag kom på
+att den var tvungen att returnera sigsjälv. Sen anropade jag bara inverse-funktionen där det skulle vara division eller subtraktion på
+Multiplier/Adder. Detta verkade lösa problemet. Det kanske inte är det snyggaste sättet att lösa uppgiften, med större kunskap om hur
+allt fungerar och hänger ihop så kanske det hade gått att lösa det på ett bättre sätt.
+
+Det var inte så jättemycket kodande på denna uppgiften heller men några exempel på kod som jag tyckte var bra:
+Att kunna utöka befintliga klasser gjorde uppgiften enklare då jag slapp gå in i constraint_networks.rb och göra ändringar.
+
+En-rads-if-satser gjorde get_connector funktionen väldigt lättläst
+	return var if var.is_a? Connector
+	
+Parallella tilldelningar löste inverse-funktionen på ett bra sätt!
+	@op,@inverse_op=@inverse_op,@op

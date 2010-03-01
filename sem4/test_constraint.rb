@@ -2,7 +2,7 @@ require "test/unit"
 require "constraint-parser.rb"
 
 class TestCN < Test::Unit::TestCase
-	def test_adder
+	def atest_adder
 		a = Connector.new("a")
 		b = Connector.new("b")
 		c = Connector.new("c")
@@ -22,7 +22,7 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(14, b.value)
 	end
 	
-	def test_multiplier
+	def atest_multiplier
 		a = Connector.new("a")
 		b = Connector.new("b")
 		c = Connector.new("c")
@@ -42,7 +42,7 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(3, b.value)
 	end
 	
-	def test_celsius2fahrenheit
+	def atest_celsius2fahrenheit
 		c, f = celsius2fahrenheit
 		
 		c.user_assign 100
@@ -56,7 +56,18 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(-18, c.value)
 	end
 	
-	def test_constraintparser
+	def test_constraintparser_simple
+		cp = ConstraintParser.new
+		c,f = cp.parse "9+c=f/5"
+		
+		f.user_assign 50
+		assert_equal(1, c.value)
+		
+		f.user_assign 100
+		assert_equal(11, c.value)
+	end
+	
+	def test_constraintparser_extended
 		cp = ConstraintParser.new
 		c,f = cp.parse "9*c=5*(f-32)"
 		
