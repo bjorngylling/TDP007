@@ -247,7 +247,7 @@ end
 # else has started and to make the test case below work.
 
 class ArithmeticConstraint
-  def inverse
+  def inverse_operator
   	# Extend the class with a function to force subtraction or division for the Adder and Multiplier classes
     @op,@inverse_op=@inverse_op,@op
     return self
@@ -301,7 +301,7 @@ class ConstraintParser < Parser
 
         match(:expr, '-', :term) do |a, _, b|
           conn_a,conn_b,conn_c=get_connectors(a,'-',b)
-          Adder.new(conn_a,conn_b,conn_c).inverse
+          Adder.new(conn_a,conn_b,conn_c).inverse_operator
         end
 
         match(:term)
@@ -317,7 +317,7 @@ class ConstraintParser < Parser
         
         match(:term, '/', :atom) do |a, _, b|
           conn_a,conn_b,conn_c=get_connectors(a,'/',b)
-          Multiplier.new(conn_a,conn_b,conn_c)
+          Multiplier.new(conn_a,conn_b,conn_c).inverse_operator
         end
         
         match(:atom)
@@ -348,7 +348,6 @@ class ConstraintParser < Parser
   	return var if var.is_a? Connector
   	return var.out if var.is_a? ArithmeticConstraint
   end
-
 
   # Unify the connectors on the left and right hand side of an equality
   def replace_conn(lh,rh)

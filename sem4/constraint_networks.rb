@@ -31,7 +31,7 @@ class ArithmeticConstraint
 
   def initialize(a, b, out)
     @logger=Logger.new(STDOUT)
-    @logger.level = Logger::DEBUG
+    @logger.level = Logger::ERROR
     @a,@b,@out=[a,b,out]
     [a,b,out].each { |x| x.add_constraint(self) }
   end
@@ -108,7 +108,7 @@ class Connector
     @informant=false
     @constraints=[]
     @logger=Logger.new(STDOUT)
-    @logger.level = Logger::DEBUG
+    @logger.level = Logger::ERROR
   end
 
   def add_constraint(c)

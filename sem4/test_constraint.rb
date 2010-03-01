@@ -2,7 +2,7 @@ require "test/unit"
 require "constraint-parser.rb"
 
 class TestCN < Test::Unit::TestCase
-	def atest_adder
+	def test_adder
 		a = Connector.new("a")
 		b = Connector.new("b")
 		c = Connector.new("c")
@@ -22,7 +22,7 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(14, b.value)
 	end
 	
-	def atest_multiplier
+	def test_multiplier
 		a = Connector.new("a")
 		b = Connector.new("b")
 		c = Connector.new("c")
@@ -42,7 +42,7 @@ class TestCN < Test::Unit::TestCase
 		assert_equal(3, b.value)
 	end
 	
-	def atest_celsius2fahrenheit
+	def test_celsius2fahrenheit
 		c, f = celsius2fahrenheit
 		
 		c.user_assign 100
